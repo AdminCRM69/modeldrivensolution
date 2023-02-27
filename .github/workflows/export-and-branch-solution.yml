@@ -1,17 +1,28 @@
+Skip to content
+Sign up
+microsoft
+/
+powerplatform-actions-lab
+Public
+Code
+Pull requests
+4
+Actions
+Security
+Insights
+powerplatform-actions-lab/sample-workflows/export-and-branch-solution-with-spn-auth.yml
+@nigelcharman
+nigelcharman Fix versions in workflow (#32)
+…
+Latest commit dfe3623 on Aug 26, 2022
+ History
+ 2 contributors
+@kkanakas@nigelcharman
+77 lines (69 sloc)  2.74 KB
+
 name: export-and-branch-solution
 # Export solution from DEV environment
 #  unpack it and prepare, commit and push a git branch with the changes
-#  
-#  using spn-auth with Client ID and Tenant ID for environemnet login 
-#  
-#  using secrets for
-#   ClientID              Service Principal App ID
-#   TentantID             Service Principal Azure AD tenant
-#   Password              User Password
-#   PowerPlatformSPN      Service Principal secrtes
-#
-#   DevEnvironmentUrl     Url referencing the development environment
-
 
 on:
   workflow_dispatch:
@@ -34,6 +45,11 @@ on:
        description: 'folder name to be created and checked in *do not change*'
        required: true
        default: solutions/
+env:
+#edit your values here
+  ENVIRONMENT_URL: 'https://org12f46ec0.crm4.dynamics.com/'
+  CLIENT_ID: '9c9db16d-9053-4f56-8d37-ab2f1d9baeef'
+  TENANT_ID: '55695bae-aa64-4abf-a569-f56feeb44859'
 
 jobs:
   export-from-dev:
@@ -48,26 +64,26 @@ jobs:
         lfs: true
 
     - name: who-am-i action
-      uses: microsoft/powerplatform-actions/who-am-i@0.4.0
+      uses: microsoft/powerplatform-actions/who-am-i@v0
       with:
-        environment-url: ${{secrets.DevEnvironmentUrl}}
-        app-id: ${{secrets.ClientID}}
+        environment-url: ${{env.ENVIRONMENT_URL}}
+        app-id: ${{env.CLIENT_ID}}
         client-secret: ${{ secrets.PowerPlatformSPN }}
-        tenant-id: ${{secrets.TentantID}}
+        tenant-id: ${{env.TENANT_ID}}
 
 
     - name: export-solution action
-      uses: microsoft/powerplatform-actions/export-solution@0.4.0
+      uses: microsoft/powerplatform-actions/export-solution@v0
       with:
-        environment-url: ${{secrets.DevEnvironmentUrl}}
-        app-id: ${{secrets.ClientID}}
+        environment-url: ${{env.ENVIRONMENT_URL}}
+        app-id: ${{env.CLIENT_ID}}
         client-secret: ${{ secrets.PowerPlatformSPN }}
-        tenant-id: ${{secrets.TentantID}}
+        tenant-id: ${{env.TENANT_ID}}
         solution-name: ${{ github.event.inputs.solution_name }}
         solution-output-file: ${{ github.event.inputs.solution_exported_folder}}/${{ github.event.inputs.solution_name }}.zip
 
     - name: unpack-solution action
-      uses: microsoft/powerplatform-actions/unpack-solution@0.4.0
+      uses: microsoft/powerplatform-actions/unpack-solution@v0
       with:
         solution-file: ${{ github.event.inputs.solution_exported_folder}}/${{ github.event.inputs.solution_name }}.zip
         solution-folder: ${{ github.event.inputs.solution_folder}}/${{ github.event.inputs.solution_name }}
@@ -81,3 +97,17 @@ jobs:
         solution-target-folder: ${{ github.event.inputs.solution_target_folder}}/${{ github.event.inputs.solution_name }}
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         allow-empty-commit: true
+Footer
+© 2023 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
